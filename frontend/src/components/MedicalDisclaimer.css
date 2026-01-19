@@ -1,0 +1,56 @@
+.medical-disclaimer {
+  background: #fff3cd;
+  border-top: 3px solid #ffc107;
+  padding: 1.5rem 2rem;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+html[data-theme="dark"] .medical-disclaimer {
+  background: rgba(255, 193, 7, 0.1);
+  border-top-color: #ff9800;
+}
+
+.disclaimer-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.disclaimer-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.disclaimer-text {
+  margin: 0;
+  color: #856404;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+html[data-theme="dark"] .disclaimer-text {
+  color: #ffd699;
+}
+
+.disclaimer-text strong {
+  font-weight: 700;
+  color: #664d03;
+}
+
+html[data-theme="dark"] .disclaimer-text strong {
+  color: #ffeb99;
+  }
+
+  .disclaimer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .disclaimer-text {
+    font-size: 0.9rem;
+  }
+}
