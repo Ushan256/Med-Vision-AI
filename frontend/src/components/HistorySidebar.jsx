@@ -8,6 +8,9 @@ export default function HistorySidebar({ selectedScan, onSelectScan }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Define API URL from environment variables
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://ushan256-med-vision-ai.hf.space';
+
   useEffect(() => {
     if (tokens && user) {
       fetchHistory()
@@ -18,7 +21,9 @@ export default function HistorySidebar({ selectedScan, onSelectScan }) {
     try {
       setLoading(true)
       setError('')
-      const response = await fetch('http://localhost:8000/history', {
+      
+      // REALITY CHECK: Pointing to Cloud URL instead of localhost
+      const response = await fetch(`${API_BASE_URL}/history`, {
         headers: {
           'Authorization': `Bearer ${tokens.access_token}`
         }
@@ -29,10 +34,12 @@ export default function HistorySidebar({ selectedScan, onSelectScan }) {
       }
 
       const data = await response.json()
+      
+      // REALITY CHECK: Accessing .items because your backend returns ScanHistoryList
       setHistory(data.items || [])
     } catch (err) {
       setError('Failed to load history')
-      console.error(err)
+      console.error("History fetch error:", err)
     } finally {
       setLoading(false)
     }
