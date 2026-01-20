@@ -2,13 +2,15 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext(null)
 
+// PRESTIGE FIX: One central place for your API link
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://ushan256-med-vision-ai.hf.space';
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [tokens, setTokens] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Load tokens and user from localStorage on mount
   useEffect(() => {
     const storedTokens = localStorage.getItem('tokens')
     const storedUser = localStorage.getItem('user')
@@ -18,24 +20,20 @@ export function AuthProvider({ children }) {
         setTokens(JSON.parse(storedTokens))
         setUser(JSON.parse(storedUser))
       } catch (e) {
-        console.error('Failed to load stored auth data:', e)
         localStorage.removeItem('tokens')
         localStorage.removeItem('user')
       }
     }
-    
     setLoading(false)
   }, [])
 
   const register = async (email, password, firstName, lastName, userType) => {
     try {
       setError(null)
-      
-      // Check if backend is reachable
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // Increased to 15s for Cloud wake-up
       
-      const response = await fetch('http://localhost:8000/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -49,39 +47,19 @@ export function AuthProvider({ children }) {
       })
       
       clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        let errorMessage = 'Registration failed'
-        try {
-          const data = await response.json()
-          errorMessage = data.detail || errorMessage
-        } catch (e) {
-          errorMessage = `Server error: ${response.status} ${response.statusText}`
-        }
-        throw new Error(errorMessage)
-      }
+      if (!response.ok) throw new Error('Registration failed')
 
       const data = await response.json()
-      setTokens({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token
-      })
+      setTokens({ access_token: data.access_token, refresh_token: data.refresh_token })
       setUser(data.user)
-      
-      localStorage.setItem('tokens', JSON.stringify({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token
-      }))
+      localStorage.setItem('tokens', JSON.stringify({ access_token: data.access_token, refresh_token: data.refresh_token }))
       localStorage.setItem('user', JSON.stringify(data.user))
-      
       return data
     } catch (err) {
-      let errorMessage = err.message
-      if (err.name === 'AbortError') {
-        errorMessage = 'Request timeout. Please check if the backend server is running on port 8000.'
-      } else if (err.message === 'Failed to fetch') {
-        errorMessage = 'Unable to connect to server. Please ensure the backend is running on http://localhost:8000'
-      }
+      // REALITY CHECK: Generic error messages for production
+      let errorMessage = err.message === 'Failed to fetch' 
+        ? 'Cannot connect to AI server. It might be waking up—please try again.' 
+        : err.message;
       setError(errorMessage)
       throw new Error(errorMessage)
     }
@@ -90,12 +68,10 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       setError(null)
-      
-      // Check if backend is reachable
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
       
-      const response = await fetch('http://localhost:8000/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -103,116 +79,62 @@ export function AuthProvider({ children }) {
       })
       
       clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        let errorMessage = 'Login failed'
-        try {
-          const data = await response.json()
-          errorMessage = data.detail || errorMessage
-        } catch (e) {
-          errorMessage = `Server error: ${response.status} ${response.statusText}`
-        }
-        throw new Error(errorMessage)
-      }
+      if (!response.ok) throw new Error('Invalid email or password')
 
       const data = await response.json()
-      setTokens({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token
-      })
+      setTokens({ access_token: data.access_token, refresh_token: data.refresh_token })
       setUser(data.user)
-      
-      localStorage.setItem('tokens', JSON.stringify({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token
-      }))
+      localStorage.setItem('tokens', JSON.stringify({ access_token: data.access_token, refresh_token: data.refresh_token }))
       localStorage.setItem('user', JSON.stringify(data.user))
-      
       return data
     } catch (err) {
-      let errorMessage = err.message
-      if (err.name === 'AbortError') {
-        errorMessage = 'Request timeout. Please check if the backend server is running on port 8000.'
-      } else if (err.message === 'Failed to fetch') {
-        errorMessage = 'Unable to connect to server. Please ensure the backend is running on http://localhost:8000'
-      }
+      let errorMessage = err.message === 'Failed to fetch' 
+        ? 'Server is currently warming up. Please wait 30 seconds and try again.' 
+        : err.message;
       setError(errorMessage)
       throw new Error(errorMessage)
     }
   }
 
   const logout = async () => {
-    // Clear tokens from localStorage immediately
+    const currentTokens = tokens;
     setUser(null)
     setTokens(null)
-    setError(null)
     localStorage.removeItem('tokens')
     localStorage.removeItem('user')
     
-    // Optionally call backend logout endpoint (if implemented)
-    // This would invalidate tokens on the server side
-    try {
-      const storedTokens = localStorage.getItem('tokens')
-      if (storedTokens) {
-        const tokens = JSON.parse(storedTokens)
-        await fetch('http://localhost:8000/auth/logout', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${tokens.access_token}`
-          }
-        }).catch(() => {
-          // Ignore errors - token is already cleared locally
-        })
-      }
-    } catch (e) {
-      // Ignore errors - cleanup is done
+    if (currentTokens) {
+      fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentTokens.access_token}`
+        }
+      }).catch(() => {})
     }
   }
 
   const refreshAccessToken = async () => {
     if (!tokens?.refresh_token) return false
-    
     try {
-      const response = await fetch('http://localhost:8000/auth/refresh', {
+      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: tokens.refresh_token })
       })
-
-      if (!response.ok) {
-        logout()
-        return false
-      }
-
+      if (!response.ok) { logout(); return false; }
       const data = await response.json()
-      const newTokens = {
-        access_token: data.access_token,
-        refresh_token: data.refresh_token
-      }
+      const newTokens = { access_token: data.access_token, refresh_token: data.refresh_token }
       setTokens(newTokens)
       localStorage.setItem('tokens', JSON.stringify(newTokens))
       return true
     } catch (err) {
-      logout()
-      return false
+      logout(); return false;
     }
   }
 
-  const value = {
-    user,
-    tokens,
-    loading,
-    error,
-    register,
-    login,
-    logout,
-    refreshAccessToken,
-    isAuthenticated: !!user
-  }
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, tokens, loading, error, register, login, logout, refreshAccessToken, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   )
@@ -220,8 +142,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider')
   return context
 }
