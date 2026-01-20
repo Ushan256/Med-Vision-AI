@@ -66,35 +66,44 @@ function App() {
     }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!file) {
-      setError('Please select an image file')
-      return
+      setError('Please select an image file');
+      return;
     }
 
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
-    const formData = new FormData()
-    formData.append('file', file)
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Dynamic URL: Uses Vercel environment variable or defaults to your HF Space
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://ushan256-med-vision-ai.hf.space';
 
     try {
-      const response = await axios.post('http://localhost:8000/predict', formData, {
+      const response = await axios.post(`${API_BASE_URL}/predict`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${tokens.access_token}`
         },
-      })
-      setResult(response.data)
+      });
+      setResult(response.data);
     } catch (err) {
-      setError(err.response?.data?.detail || 'An error occurred while processing the image')
-      console.error('Error:', err)
+      // Professional Error Handling: Checks if the server is "sleeping" (Cold Start)
+      const isNetworkError = !err.response;
+      const errorMessage = isNetworkError 
+        ? 'Cannot connect to AI server. It might be waking up—please try again in 30 seconds.' 
+        : (err.response?.data?.detail || 'An error occurred while processing the image');
+      
+      setError(errorMessage);
+      console.error('API Error:', err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleReset = () => {
     setFile(null)
