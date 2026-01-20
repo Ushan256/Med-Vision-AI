@@ -568,12 +568,6 @@ Always consult qualified healthcare professionals for medical diagnoses.
 
 ---
 
-## License
-
-This project is licensed under the **MIT License** - see the LICENSE file for details.
-
----
-
 ## Acknowledgments
 
 - **Dataset**: [Chest X-Ray Pneumonia Dataset](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia) by Paul Mooney
