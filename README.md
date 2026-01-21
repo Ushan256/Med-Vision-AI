@@ -8,7 +8,6 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)
 ![React](https://img.shields.io/badge/React-18.2+-61dafb.svg)
 ![SQLite](https://img.shields.io/badge/SQLite-3.0+-yellow.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 **Professional AI-powered medical imaging solution for pneumonia detection with user authentication, scan history, and explainable AI**
 
