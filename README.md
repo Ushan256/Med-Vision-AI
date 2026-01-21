@@ -127,7 +127,7 @@
 
 1. **Clone the repository**:
 ```bash
-git clone <repository-url>
+git clone https://github.com/Ushan256/Med-Vision-AI.git
 cd "AI Medical Imaging Project"
 ```
 
@@ -340,7 +340,7 @@ Get details of a specific scan.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    React Frontend                            │
+│                    React Frontend                           │
 │  • AuthContext (JWT token management)                       │
 │  • User Authentication (Login/Signup)                       │
 │  • Image Upload & Preview                                   │
@@ -362,8 +362,8 @@ Get details of a specific scan.
                          │ SQLAlchemy ORM
 ┌────────────────────────▼────────────────────────────────────┐
 │              SQLite Database (medical_ai.db)                │
-│  • users table (email, password_hash, names, role)         │
-│  • scan_history table (user_id, predictions, images)       │
+│  • users table (email, password_hash, names, role)          │
+│  • scan_history table (user_id, predictions, images)        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
