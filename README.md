@@ -127,8 +127,11 @@
 
 1. **Clone the repository**:
 ```bash
+# Clone the repository
 git clone https://github.com/Ushan256/Med-Vision-AI.git
-cd "AI Medical Imaging Project"
+
+# Navigate into the project directory
+cd Med-Vision-AI
 ```
 
 2. **Navigate to backend directory**:
