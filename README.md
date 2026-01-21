@@ -582,13 +582,12 @@ Always consult qualified healthcare professionals for medical diagnoses.
 ## Contact & Support
 
 For questions, issues, or contributions:
-- **Issues**: Open an issue on GitHub
-- **Documentation**: Check this README for detailed information
-- **API Docs**: Visit `http://localhost:8000/docs` when backend is running
-
 - **Developed by**: Ushan
 - **Program**: BS Computer Science
 - **Focus**: Artificial Intelligence, Explainable AI (XAI), Deep Learning Architecture, Professional Medical Utility & Diagnostic Assistance
+- **Issues**: Open an issue on GitHub
+- **Documentation**: Check this README for detailed information
+- **API Docs**: Visit `http://localhost:8000/docs` when backend is running
 
 ---
 
